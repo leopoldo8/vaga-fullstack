@@ -3,6 +3,8 @@ import express, { json, urlencoded } from 'express';
 import httpErrors from 'http-errors';
 import logger from 'morgan';
 import { join } from 'path';
+import mongoose from 'mongoose';
+require('dotenv').config()
 
 import indexRouter from './routes/index';
 
@@ -32,5 +34,14 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json(err);
 });
+
+// connect to mongodb with mongoose
+mongoose.connect(process.env.DATABASE_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+const db = mongoose.connection;
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.info('Successfully connected to database.'));
 
 export default app;
